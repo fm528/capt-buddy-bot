@@ -5,12 +5,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Player():
     def __init__(self):
         self.username = None
         self.angel = None
         self.mortal = None
         self.chat_id = None
+
 
 def loadPlayers(players: dict):
     with open(config.PLAYERS_FILENAME) as csv_file:
@@ -34,6 +36,7 @@ def loadPlayers(players: dict):
     validatePairings(players)
     loadChatID(players)
 
+
 def validatePairings(players: dict):
     for _, player in players.items():
         if player.angel.mortal.username != player.username or player.mortal.angel.username != player.username:
@@ -43,13 +46,15 @@ def validatePairings(players: dict):
 
     logger.info(f'Validation complete, no issues with pairings.')
 
+
 def saveChatID(players: dict):
     temp = {}
     for k, v in players.items():
         temp[k] = v.chat_id
-    
+
     with open(config.CHAT_ID_JSON, 'w+') as f:
         json.dump(temp, f)
+
 
 def loadChatID(players: dict):
     try:

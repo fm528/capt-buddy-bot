@@ -1,5 +1,16 @@
+# venv files
+/bin
+/include
+/lib
+pyvenv.cfg
+
+# pycache
+/__pycache__
+
+# input files
 *.csv
-__pycache__
 *.pem
-*.log
 *.json
+
+# log file
+/logs

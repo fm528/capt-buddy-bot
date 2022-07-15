@@ -1,3 +1,3 @@
-# Bot logs
+## Bot Logs
 
-Logs will appear here
+Logs will appear here.

@@ -11,7 +11,6 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 
 CHOOSING, ANGEL, MORTAL = range(3)
 
-
 # Enable logging
 logging.basicConfig(
     filename=f'logs/{datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")}.log',
@@ -26,6 +25,8 @@ player.loadPlayers(players)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
+
+
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     playerName = update.message.chat.username.lower()
@@ -39,9 +40,11 @@ def start(update: Update, context: CallbackContext) -> None:
 
     update.message.reply_text(f'Hi! {messages.HELP_TEXT}')
 
+
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text(messages.HELP_TEXT)
+
 
 def reload_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /reloadplayers is issued."""
@@ -52,6 +55,7 @@ def reload_command(update: Update, context: CallbackContext) -> None:
     logger.info(f'Players reloaded')
 
     update.message.reply_text(f'Players reloaded')
+
 
 def send_command(update: Update, context: CallbackContext):
     """Start send convo when the command /send is issued."""
@@ -72,6 +76,7 @@ def send_command(update: Update, context: CallbackContext):
 
     return CHOOSING
 
+
 def startAngel(update: Update, context: CallbackContext):
     playerName = update.callback_query.message.chat.username.lower()
     if players[playerName].angel.chat_id is None:
@@ -81,6 +86,7 @@ def startAngel(update: Update, context: CallbackContext):
 
     update.callback_query.message.reply_text(messages.getPlayerMessage(config.ANGEL_ALIAS))
     return ANGEL
+
 
 def startMortal(update: Update, context: CallbackContext):
     playerName = update.callback_query.message.chat.username.lower()
@@ -92,63 +98,65 @@ def startMortal(update: Update, context: CallbackContext):
     update.callback_query.message.reply_text(messages.getPlayerMessage(config.MORTAL_ALIAS))
     return MORTAL
 
+
 def sendNonTextMessage(message, bot, chat_id):
     if message.photo:
         bot.send_photo(
-            photo = message.photo[-1],
-            caption = message.caption,
-            chat_id = chat_id
-            )
+            photo=message.photo[-1],
+            caption=message.caption,
+            chat_id=chat_id
+        )
     elif message.sticker:
         bot.send_sticker(
-            sticker = message.sticker,
-            chat_id = chat_id
-            )
+            sticker=message.sticker,
+            chat_id=chat_id
+        )
     elif message.document:
         bot.send_document(
-            document = message.document,
-             caption = message.caption,
-            chat_id = chat_id
+            document=message.document,
+            caption=message.caption,
+            chat_id=chat_id
         )
     elif message.video:
         bot.send_video(
-            video = message.video,
-            caption = message.caption,
-            chat_id = chat_id
+            video=message.video,
+            caption=message.caption,
+            chat_id=chat_id
         )
     elif message.video_note:
         bot.send_video_note(
-            video_note = message.video_note,
-            chat_id = chat_id
+            video_note=message.video_note,
+            chat_id=chat_id
         )
     elif message.voice:
         bot.send_voice(
-            voice = message.voice,
-            chat_id = chat_id
+            voice=message.voice,
+            chat_id=chat_id
         )
     elif message.audio:
         bot.send_audio(
-            audio = message.audio,
-            chat_id = chat_id
+            audio=message.audio,
+            chat_id=chat_id
         )
     elif message.animation:
         bot.send_animation(
-            animation = message.animation,
-            chat_id = chat_id
+            animation=message.animation,
+            chat_id=chat_id
         )
+
 
 def sendAngel(update: Update, context: CallbackContext):
     playerName = update.message.chat.username.lower()
-    
+
     if update.message.text:
         context.bot.send_message(
-            text = messages.getReceivedMessage(config.MORTAL_ALIAS, update.message.text),
-            chat_id = players[playerName].angel.chat_id
+            text=messages.getReceivedMessage(config.MORTAL_ALIAS, update.message.text),
+            chat_id=players[playerName].angel.chat_id
         )
     else:
         context.bot.send_message(
-            text = messages.getReceivedMessage(config.MORTAL_ALIAS),
-            chat_id = players[playerName].angel.chat_id
+            text=messages.getReceivedMessage(config.MORTAL_ALIAS),
+            chat_id=players[playerName].angel.chat_id
         )
         sendNonTextMessage(update.message, context.bot, players[playerName].angel.chat_id)
 
@@ -158,18 +166,19 @@ def sendAngel(update: Update, context: CallbackContext):
 
     return ConversationHandler.END
 
+
 def sendMortal(update: Update, context: CallbackContext):
     playerName = update.message.chat.username.lower()
 
     if update.message.text:
         context.bot.send_message(
-            text = messages.getReceivedMessage(config.ANGEL_ALIAS, update.message.text),
-            chat_id = players[playerName].mortal.chat_id
+            text=messages.getReceivedMessage(config.ANGEL_ALIAS, update.message.text),
+            chat_id=players[playerName].mortal.chat_id
         )
     else:
         context.bot.send_message(
-            text = messages.getReceivedMessage(config.ANGEL_ALIAS),
-            chat_id = players[playerName].mortal.chat_id
+            text=messages.getReceivedMessage(config.ANGEL_ALIAS),
+            chat_id=players[playerName].mortal.chat_id
         )
         sendNonTextMessage(update.message, context.bot, players[playerName].mortal.chat_id)
 
@@ -179,6 +188,7 @@ def sendMortal(update: Update, context: CallbackContext):
 
     return ConversationHandler.END
 
+
 def cancel(update: Update, context: CallbackContext) -> int:
     logger.info(f"{update.message.chat.username} canceled the conversation.")
     update.message.reply_text(
@@ -186,6 +196,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
     )
 
     return ConversationHandler.END
+
 
 def main():
     """Start the bot."""
