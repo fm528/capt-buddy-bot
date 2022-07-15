@@ -155,7 +155,7 @@ def main():
     dispatcher.add_handler(CommandHandler("chat", chat_command))
     dispatcher.add_handler(CommandHandler("reload", reload_command))
     dispatcher.add_handler(CommandHandler("end", end_command))
-    dispatcher.add_handler(MessageHandler(sendMsg))
+    dispatcher.add_handler(MessageHandler(Filters.all, sendMsg))
 
     updater.start_polling()
     updater.idle()
