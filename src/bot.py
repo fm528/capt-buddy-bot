@@ -9,7 +9,6 @@ import config
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler, CallbackQueryHandler
 
-CHOOSING, ANGEL, MORTAL = range(3)
 
 # Enable logging.
 logging.basicConfig(
@@ -25,7 +24,7 @@ players = defaultdict(player.Player)
 player.loadPlayers(players)
 
 
-def start(update: Update, context: CallbackContext) -> None:
+def start_command(update: Update, context: CallbackContext) -> None:
     # Send a message when the command /start is issued.
     playerName = update.message.chat.username.lower()
     if players[playerName].username is None:
@@ -52,8 +51,8 @@ def reload_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(f'Players reloaded.')
 
 
-def send_command(update: Update, context: CallbackContext):
-    # Start send convo when the command /send is issued
+def chat_command(update: Update, context: CallbackContext):
+    # Start send convo when the command /chat is issued
     playerName = update.message.chat.username.lower()
     if players[playerName].username is None:
         # Player not found/ registered.
@@ -63,32 +62,12 @@ def send_command(update: Update, context: CallbackContext):
         # Player chat id not found.
         update.message.reply_text(messages.ERROR_CHAT_ID)
         return ConversationHandler.END
-    send_menu = [[InlineKeyboardButton(config.ANGEL_ALIAS, callback_data='angel')],
-                 [InlineKeyboardButton(config.MORTAL_ALIAS, callback_data='mortal')]]
-    reply_markup = InlineKeyboardMarkup(send_menu)
-    update.message.reply_text(messages.SEND_COMMAND, reply_markup=reply_markup)
-    return CHOOSING
-
-
-def startAngel(update: Update, context: CallbackContext):
-    playerName = update.callback_query.message.chat.username.lower()
-    if players[playerName].angel.chat_id is None:
-        update.callback_query.message.reply_text(messages.getBotNotStartedMessage(config.ANGEL_ALIAS))
-        logger.info(messages.getNotRegisteredLog(config.ANGEL_ALIAS, playerName, players[playerName].angel.username))
-        return ConversationHandler.END
-    update.callback_query.message.reply_text(messages.getPlayerMessage(config.ANGEL_ALIAS))
-    return ANGEL
-
-
-def startMortal(update: Update, context: CallbackContext):
-    playerName = update.callback_query.message.chat.username.lower()
-    if players[playerName].mortal.chat_id is None:
-        update.callback_query.message.reply_text(messages.getBotNotStartedMessage(config.MORTAL_ALIAS))
-        logger.info(messages.getNotRegisteredLog(config.MORTAL_ALIAS, playerName, players[playerName].mortal.username))
-        return ConversationHandler.END
-
-    update.callback_query.message.reply_text(messages.getPlayerMessage(config.MORTAL_ALIAS))
-    return MORTAL
+    if not players[playerName].is_online:
+        players[playerName].is_online = True
+        if not players[playerName].partner.is_online:
+            update.message.reply_text('You are now online but your friend has not started the chat.')
+        else:
+            update.message.reply_text('You are now online and connected to your friend.')
 
 
 def sendNonTextMessage(message, bot, chat_id):
@@ -137,48 +116,32 @@ def sendNonTextMessage(message, bot, chat_id):
         )
 
 
-def sendAngel(update: Update, context: CallbackContext):
+def sendMsg(update: Update, context: CallbackContext):
     playerName = update.message.chat.username.lower()
+    if not players[playerName].is_online:
+        return
     if update.message.text:
         context.bot.send_message(
-            text=messages.getReceivedMessage(config.MORTAL_ALIAS, update.message.text),
-            chat_id=players[playerName].angel.chat_id
+            text=update.message.text,
+            chat_id=players[playerName].partner.chat_id
         )
     else:
-        context.bot.send_message(
-            text=messages.getReceivedMessage(config.MORTAL_ALIAS),
-            chat_id=players[playerName].angel.chat_id
-        )
-        sendNonTextMessage(update.message, context.bot, players[playerName].angel.chat_id)
-    update.message.reply_text(messages.MESSAGE_SENT)
-    logger.info(messages.getSentMessageLog(config.ANGEL_ALIAS, playerName, players[playerName].angel.username))
-    return ConversationHandler.END
+        sendNonTextMessage(update.message, context.bot, players[playerName].partner.chat_id)
+    # logger.info(messages.getSentMessageLog(config.ANGEL_ALIAS, playerName, players[playerName].angel.username))
 
 
-def sendMortal(update: Update, context: CallbackContext):
+def end_command(update: Update, context: CallbackContext) -> int:
+    # End convo when the command /end is issued.
     playerName = update.message.chat.username.lower()
-    if update.message.text:
-        context.bot.send_message(
-            text=messages.getReceivedMessage(config.ANGEL_ALIAS, update.message.text),
-            chat_id=players[playerName].mortal.chat_id
-        )
-    else:
-        context.bot.send_message(
-            text=messages.getReceivedMessage(config.ANGEL_ALIAS),
-            chat_id=players[playerName].mortal.chat_id
-        )
-        sendNonTextMessage(update.message, context.bot, players[playerName].mortal.chat_id)
-    update.message.reply_text(messages.MESSAGE_SENT)
-    logger.info(messages.getSentMessageLog(config.MORTAL_ALIAS, playerName, players[playerName].mortal.username))
-    return ConversationHandler.END
-
-
-def cancel(update: Update, context: CallbackContext) -> int:
+    players[playerName].is_online = False
     logger.info(f"{update.message.chat.username} canceled the conversation.")
-    update.message.reply_text(
-        'Sending message cancelled.', reply_markup=ReplyKeyboardRemove()
+    context.bot.send_message(
+        text="Your friend has ended the conversation.",
+        chat_id=players[playerName].partner.chat_id
     )
-    return ConversationHandler.END
+    update.message.reply_text(
+        'Sending message cancelled.'
+    )
 
 
 def main():
@@ -187,21 +150,13 @@ def main():
 
     # Get the dispatcher to register handlers.
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("start", start_command))
     dispatcher.add_handler(CommandHandler("help", help_command))
-    dispatcher.add_handler(CommandHandler("reloadplayers", reload_command))
+    dispatcher.add_handler(CommandHandler("chat", chat_command))
+    dispatcher.add_handler(CommandHandler("reload", reload_command))
+    dispatcher.add_handler(CommandHandler("end", end_command))
+    dispatcher.add_handler(MessageHandler(sendMsg))
 
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('send', send_command)],
-        states={
-            CHOOSING: [CallbackQueryHandler(startAngel, pattern='angel'), CallbackQueryHandler(startMortal, pattern='mortal')],
-            ANGEL: [MessageHandler(~Filters.command, sendAngel)],
-            MORTAL: [MessageHandler(~Filters.command, sendMortal)]
-        },
-        fallbacks=[CommandHandler('cancel', cancel)],
-    )
-
-    dispatcher.add_handler(conv_handler)
     updater.start_polling()
     updater.idle()
 

@@ -1,8 +1,5 @@
 # venv files
-/bin
-/include
-/lib
-pyvenv.cfg
+/.venv
 
 # pycache
 /__pycache__

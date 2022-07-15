@@ -29,6 +29,7 @@ def loadPlayers(players: dict):
                 logger.info(f'\t{playerName} has partner {partnerName}.')
                 players[playerName].username = playerName
                 players[playerName].partner = players[partnerName]
+                players[playerName].is_online = False
                 line_count += 1
         logger.info(f'Processed {line_count} lines.')
     validatePairings(players)
