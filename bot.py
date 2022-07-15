@@ -2,7 +2,7 @@ import logging
 import player
 import messages
 import datetime
-import collections
+from collections import defaultdict
 
 import config
 
@@ -11,51 +11,56 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 
 CHOOSING, ANGEL, MORTAL = range(3)
 
-# Enable logging
+# Enable logging.
 logging.basicConfig(
     filename=f'log/{datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")}.log',
     filemode='w',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
-players = collections.defaultdict(player.Player)
+# Initialise players.
+# Default value for the dictionary is a new Player object.
+players = defaultdict(player.Player)
 player.loadPlayers(players)
 
 
 def start(update: Update, context: CallbackContext) -> None:
-    # Send a message when the command /start is issued
+    # Send a message when the command /start is issued.
     playerName = update.message.chat.username.lower()
     if players[playerName].username is None:
+        # Player not found/ registered.
         update.message.reply_text(messages.NOT_REGISTERED)
         return
+    # Register chat id for message sending.
     players[playerName].chat_id = update.message.chat.id
-    logger.info(f'{playerName} started the bot with chat_id {players[playerName].chat_id}')
-    update.message.reply_text(f'Hi! {messages.HELP_TEXT}')
+    logger.info(f'{playerName} started the bot with chat_id {players[playerName].chat_id}.')
+    update.message.reply_text(f'Hey {playerName}! {messages.HELP_TEXT}')
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
-    # Send a message when the command /help is issued
+    # Send a message when the command /help is issued.
     update.message.reply_text(messages.HELP_TEXT)
 
 
 def reload_command(update: Update, context: CallbackContext) -> None:
-    # Send a message when the command /reloadplayers is issued
+    # Send a message when the command /reloadplayers is issued.
     player.saveChatID(players)
-    logger.info(f'Player chat ids have been saved in {config.CHAT_ID_JSON}')
+    logger.info(f'Player chat ids have been saved in {config.CHAT_ID_JSON}.')
     player.loadPlayers(players)
-    logger.info(f'Players reloaded')
-    update.message.reply_text(f'Players reloaded')
+    logger.info(f'Players reloaded.')
+    update.message.reply_text(f'Players reloaded.')
 
 
 def send_command(update: Update, context: CallbackContext):
     # Start send convo when the command /send is issued
     playerName = update.message.chat.username.lower()
     if players[playerName].username is None:
+        # Player not found/ registered.
         update.message.reply_text(messages.NOT_REGISTERED)
         return ConversationHandler.END
     if players[playerName].chat_id is None:
+        # Player chat id not found.
         update.message.reply_text(messages.ERROR_CHAT_ID)
         return ConversationHandler.END
     send_menu = [[InlineKeyboardButton(config.ANGEL_ALIAS, callback_data='angel')],
@@ -177,16 +182,11 @@ def cancel(update: Update, context: CallbackContext) -> int:
 
 
 def main():
-    """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
+    # Start the bot.
     updater = Updater(config.ANGEL_BOT_TOKEN, use_context=True)
 
-    # Get the dispatcher to register handlers
+    # Get the dispatcher to register handlers.
     dispatcher = updater.dispatcher
-
-    # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
     dispatcher.add_handler(CommandHandler("reloadplayers", reload_command))
@@ -202,13 +202,7 @@ def main():
     )
 
     dispatcher.add_handler(conv_handler)
-
-    # Start the Bot
     updater.start_polling()
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
 

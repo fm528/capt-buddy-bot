@@ -1,6 +1,6 @@
 # Angel and Mortals Bot
 
-Send anonymous messages between angels and mortals. 
+Send anonymous messages between angels and mortals.
 
 **[NEW]** Now supports photos, stickers, documents, audio, video, and animations!
 
@@ -14,12 +14,15 @@ Data used for the game was small so just use file PLAYERS_FILENAME to store user
 Order of columns is player, angel and mortal with one header row.
 
 Sample:
+
 ```
 Player,Angel,Mortal
 username1,username2,username3
 username2,username3,username1
 username3,username1,username2
 ```
+
+Note: username/ handle is without @
 
 ## Environment variables
 
@@ -30,5 +33,6 @@ ANGEL_ALIAS = os.environ['ANGEL_ALIAS']
 MORTAL_ALIAS = os.environ['MORTAL_ALIAS']
 
 ## Useful references
+
 https://python-telegram-bot.readthedocs.io/en/stable/telegram.bot.html#telegram.Bot.sendAnimation
 https://python-telegram-bot.readthedocs.io/en/stable/telegram.message.html#telegram.Message

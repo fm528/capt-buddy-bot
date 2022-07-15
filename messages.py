@@ -2,13 +2,12 @@ import config
 
 MESSAGE_SENT = 'Message sent!\n(/send to send another!)'
 HELP_TEXT = (
-    f'Use /send to send a message to your {config.ANGEL_ALIAS} or {config.MORTAL_ALIAS} and /cancel to cancel message.'
-    f'\n\n'
-    f'This bot supports forwarding only text, photos, stickers, documents, audio, video, and animations.'
+    'Use /send to send a message to your friend and /cancel to cancel message.'
+    '\n\nThis bot supports forwarding only text, photos, stickers, documents, audio, video, and animations.'
 )
-ERROR_CHAT_ID = 'Sorry an error occured please type /start again'
-SEND_COMMAND = 'Send a message to my:\n(/cancel to stop)'
-NOT_REGISTERED = 'Sorry you are not registered with the game currently'
+ERROR_CHAT_ID = 'Sorry an error occured please type /start again.'
+SEND_COMMAND = 'Send a message to your friend!\nUse /cancel to stop.'
+NOT_REGISTERED = 'Sorry you are not registered with the game currently.'
 
 
 def getBotNotStartedMessage(alias):
