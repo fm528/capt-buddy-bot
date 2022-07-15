@@ -13,7 +13,7 @@ CHOOSING, ANGEL, MORTAL = range(3)
 
 # Enable logging
 logging.basicConfig(
-    filename=f'logs/{datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")}.log',
+    filename=f'log/{datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")}.log',
     filemode='w',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
@@ -23,57 +23,45 @@ logger = logging.getLogger(__name__)
 players = collections.defaultdict(player.Player)
 player.loadPlayers(players)
 
-# Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
-
 
 def start(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /start is issued."""
+    # Send a message when the command /start is issued
     playerName = update.message.chat.username.lower()
     if players[playerName].username is None:
         update.message.reply_text(messages.NOT_REGISTERED)
         return
-
     players[playerName].chat_id = update.message.chat.id
-
     logger.info(f'{playerName} started the bot with chat_id {players[playerName].chat_id}')
-
     update.message.reply_text(f'Hi! {messages.HELP_TEXT}')
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /help is issued."""
+    # Send a message when the command /help is issued
     update.message.reply_text(messages.HELP_TEXT)
 
 
 def reload_command(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /reloadplayers is issued."""
+    # Send a message when the command /reloadplayers is issued
     player.saveChatID(players)
     logger.info(f'Player chat ids have been saved in {config.CHAT_ID_JSON}')
-
     player.loadPlayers(players)
     logger.info(f'Players reloaded')
-
     update.message.reply_text(f'Players reloaded')
 
 
 def send_command(update: Update, context: CallbackContext):
-    """Start send convo when the command /send is issued."""
+    # Start send convo when the command /send is issued
     playerName = update.message.chat.username.lower()
-
     if players[playerName].username is None:
         update.message.reply_text(messages.NOT_REGISTERED)
         return ConversationHandler.END
-
     if players[playerName].chat_id is None:
         update.message.reply_text(messages.ERROR_CHAT_ID)
         return ConversationHandler.END
-
     send_menu = [[InlineKeyboardButton(config.ANGEL_ALIAS, callback_data='angel')],
                  [InlineKeyboardButton(config.MORTAL_ALIAS, callback_data='mortal')]]
     reply_markup = InlineKeyboardMarkup(send_menu)
     update.message.reply_text(messages.SEND_COMMAND, reply_markup=reply_markup)
-
     return CHOOSING
 
 
@@ -83,7 +71,6 @@ def startAngel(update: Update, context: CallbackContext):
         update.callback_query.message.reply_text(messages.getBotNotStartedMessage(config.ANGEL_ALIAS))
         logger.info(messages.getNotRegisteredLog(config.ANGEL_ALIAS, playerName, players[playerName].angel.username))
         return ConversationHandler.END
-
     update.callback_query.message.reply_text(messages.getPlayerMessage(config.ANGEL_ALIAS))
     return ANGEL
 
@@ -147,7 +134,6 @@ def sendNonTextMessage(message, bot, chat_id):
 
 def sendAngel(update: Update, context: CallbackContext):
     playerName = update.message.chat.username.lower()
-
     if update.message.text:
         context.bot.send_message(
             text=messages.getReceivedMessage(config.MORTAL_ALIAS, update.message.text),
@@ -159,17 +145,13 @@ def sendAngel(update: Update, context: CallbackContext):
             chat_id=players[playerName].angel.chat_id
         )
         sendNonTextMessage(update.message, context.bot, players[playerName].angel.chat_id)
-
     update.message.reply_text(messages.MESSAGE_SENT)
-
     logger.info(messages.getSentMessageLog(config.ANGEL_ALIAS, playerName, players[playerName].angel.username))
-
     return ConversationHandler.END
 
 
 def sendMortal(update: Update, context: CallbackContext):
     playerName = update.message.chat.username.lower()
-
     if update.message.text:
         context.bot.send_message(
             text=messages.getReceivedMessage(config.ANGEL_ALIAS, update.message.text),
@@ -181,11 +163,8 @@ def sendMortal(update: Update, context: CallbackContext):
             chat_id=players[playerName].mortal.chat_id
         )
         sendNonTextMessage(update.message, context.bot, players[playerName].mortal.chat_id)
-
     update.message.reply_text(messages.MESSAGE_SENT)
-
     logger.info(messages.getSentMessageLog(config.MORTAL_ALIAS, playerName, players[playerName].mortal.username))
-
     return ConversationHandler.END
 
 
@@ -194,7 +173,6 @@ def cancel(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         'Sending message cancelled.', reply_markup=ReplyKeyboardRemove()
     )
-
     return ConversationHandler.END
 
 

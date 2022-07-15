@@ -8,9 +8,12 @@ pyvenv.cfg
 /__pycache__
 
 # input files
-*.csv
-*.pem
-*.json
+.csv
+.pem
+.json
+
+# env variables
+.env
 
 # log file
-/logs
+/log
