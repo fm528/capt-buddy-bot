@@ -5,10 +5,10 @@
 src/__pycache__
 
 # input files
-/inputs
+
 
 # env variables
 .env
 
 # log file
-/log
+

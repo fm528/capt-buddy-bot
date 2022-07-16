@@ -4,8 +4,8 @@ import messages
 import logging
 import datetime
 from collections import defaultdict
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler, CallbackQueryHandler
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
 
 
 PORT = int(os.environ.get('PORT', 5000))
@@ -57,11 +57,11 @@ def chat_command(update: Update, context: CallbackContext):
     if not players[playerName].is_online:
         players[playerName].is_online = True
         if not players[playerName].partner.is_online:
-            update.message.reply_text('You are now online but your friend has not started the chat.')
+            update.message.reply_text(messages.PARTNER_UNAVAILABLE)
         else:
-            update.message.reply_text('You are now online and connected to your friend.')
+            update.message.reply_text(messages.PARTNER_AVAILABLE)
             context.bot.send_message(
-                text="Your friend has joined the chat.",
+                text=messages.INFORM_PARTNER,
                 chat_id=players[playerName].partner.chat_id
             )
 
@@ -114,7 +114,7 @@ def sendNonTextMessage(message, bot, chat_id):
 
 def sendMsg(update: Update, context: CallbackContext):
     playerName = update.message.chat.username.lower()
-    if not players[playerName].is_online:
+    if not players[playerName].is_online or not players[playerName].partner.is_online:
         return
     if update.message.text:
         context.bot.send_message(
@@ -129,57 +129,44 @@ def end_command(update: Update, context: CallbackContext) -> None:
     # End convo when the command /end is issued.
     playerName = update.message.chat.username.lower()
     players[playerName].is_online = False
-    logger.info(f"{update.message.chat.username} cancelled the conversation.")
-    context.bot.send_message(
-        text="Your friend has ended the conversation.",
-        chat_id=players[playerName].partner.chat_id
-    )
-    update.message.reply_text(
-        'Sending message cancelled.'
-    )
+    logger.info(f"{update.message.chat.username} ended the conversation.")
+    if players[playerName].partner.is_online:
+        context.bot.send_message(
+            text=messages.LEFT_CHAT,
+            chat_id=players[playerName].partner.chat_id
+        )
+    update.message.reply_text('Sending message cancelled.')
 
 
 def admin_command(update: Update, context: CallbackContext) -> None:
-    # Display admin console when the command /admin is issued.
-    send_menu = [[InlineKeyboardButton('Upload', callback_data='upload')],
-                 [InlineKeyboardButton('Reload', callback_data='reload')],
-                 [InlineKeyboardButton('Reset', callback_data='reset')],
-                 [InlineKeyboardButton('Exit', callback_data='exit')]]
-    reply_markup = InlineKeyboardMarkup(send_menu)
-    update.message.reply_text(messages.SEND_COMMAND, reply_markup=reply_markup)
+    # Display admin guide when the command /admin is issued.
+    update.message.reply_text(messages.ADMIN_GUIDE)
 
 
 def upload_command(update: Update, context: CallbackContext) -> None:
-    # Request for csv when the command upload is issued.
-    update.message.reply_text('Please send your csv file here.')
-
-
-def uploadingCSV(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Saved file.')
-    with open("./inputs/pairings.csv", 'wb+') as csv_file:
+    with open('./inputs/pairings.csv', 'wb+') as csv_file:
         context.bot.get_file(update.message.document).download(out=csv_file)
     reload_command(update, CallbackContext)
 
 
 def reload_command(update: Update, context: CallbackContext) -> None:
-    # Reload database when the command reload is issue
-    player.saveChatID(players)
-    logger.info(f'Player chat ids have been saved in.')
-    player.loadPlayers(players)
-    logger.info(f'Players reloaded.')
-    update.message.reply_text(f'Players reloaded.')
+    # Reload database after receiving new csv file.
+    update.message.reply_text(player.loadPlayers(players))
+    update.message.reply_text('Players reloaded successfully.')
+    logger.info('Players reloaded with new csv file.')
 
 
 def reset_command(update: Update, context: CallbackContext) -> None:
     # Reset database when the command reset is issued.
-    pass
-
-
-def exit_command(update: Update, context: CallbackContext) -> int:
-    # Close admin console when the command exit is issued.
-    update.message.reply_text(
-        "Sending message cancelled."
-    )
+    players.clear()
+    if os.path.exists('./inputs/pairings.csv'):
+        os.remove('./inputs/pairings.csv')
+        logger.info('Pairings.csv has been removed.')
+    else:
+        logger.info('Pairings.csv not found.')
+    update.message.reply_text('Players have been resetted.')
+    logger.info('Players have been resetted.')
 
 
 def main():
@@ -195,15 +182,14 @@ def main():
 
     # Admin commands.
     dispatcher.add_handler(CommandHandler("admin", admin_command))
-    dispatcher.add_handler(CallbackQueryHandler(upload_command, pattern="upload"))
-    dispatcher.add_handler(CallbackQueryHandler(reset_command, pattern="reset"))
-    dispatcher.add_handler(MessageHandler(Filters.document.file_extension("csv"), uploadingCSV))
-    dispatcher.add_handler(CommandHandler("exit", exit_command))
+    dispatcher.add_handler(CommandHandler("reset", reset_command))
+    dispatcher.add_handler(MessageHandler(Filters.document.file_extension("csv"), upload_command))
 
     updater.start_webhook(listen="0.0.0.0",
                           port=int(PORT),
                           url_path=BOT_TOKEN)
     updater.bot.setWebhook('https://capt-buddy-bot.herokuapp.com/' + BOT_TOKEN)
+    # updater.start_polling()
     updater.idle()
 
 
@@ -212,5 +198,4 @@ if __name__ == '__main__':
         logger.info("Bot has started.")
         main()
     finally:
-        player.saveChatID(players)
-        logger.info(f'Player chat ids have been saved in.')
+        logger.info("Bot has terminated.")
