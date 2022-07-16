@@ -3,12 +3,3 @@
 
 # pycache
 src/__pycache__
-
-# input files
-
-
-# env variables
-.env
-
-# log file
-

@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 # Initialise players.
 # Default value for the dictionary is a new Player object.
 players = defaultdict(player.Player)
-player.loadPlayers(players)
 
 
 def start_command(update: Update, context: CallbackContext) -> None:
@@ -32,7 +31,8 @@ def start_command(update: Update, context: CallbackContext) -> None:
     # Register chat id for message sending.
     players[playerName].chat_id = update.message.chat.id
     logger.info(f'{playerName} started the bot with chat_id {players[playerName].chat_id}.')
-    update.message.reply_text(f'Hey {playerName}! {messages.HELP_TEXT}')
+    update.message.reply_text(f'Hey {playerName}!\n\n{messages.WELCOME_TEXT}{messages.HELP_TEXT}')
+    chat_command(update, context)
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
@@ -40,8 +40,8 @@ def help_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(messages.HELP_TEXT)
 
 
-def chat_command(update: Update, context: CallbackContext):
-    # Start send convo when the command /chat is issued
+def chat_command(update: Update, context: CallbackContext) -> None:
+    # Checks if player can start chatting.
     playerName = update.message.chat.username.lower()
     if players[playerName].username is None:
         # Player not found/ registered.
@@ -51,19 +51,17 @@ def chat_command(update: Update, context: CallbackContext):
         # Player chat id not found.
         update.message.reply_text(messages.ERROR_CHAT_ID)
         return ConversationHandler.END
-    if not players[playerName].is_online:
-        players[playerName].is_online = True
-        if not players[playerName].partner.is_online:
-            update.message.reply_text(messages.PARTNER_UNAVAILABLE)
-        else:
-            update.message.reply_text(messages.PARTNER_AVAILABLE)
-            context.bot.send_message(
-                text=messages.INFORM_PARTNER,
-                chat_id=players[playerName].partner.chat_id
-            )
+    if players[playerName].partner.chat_id is None:
+        update.message.reply_text(messages.PARTNER_UNAVAILABLE)
+    else:
+        update.message.reply_text(messages.PARTNER_AVAILABLE)
+        context.bot.send_message(
+            text=messages.INFORM_PARTNER,
+            chat_id=players[playerName].partner.chat_id
+        )
 
 
-def sendNonTextMessage(message, bot, chat_id):
+def sendNonTextMessage(message, bot, chat_id) -> None:
     if message.photo:
         bot.send_photo(
             photo=message.photo[-1],
@@ -109,9 +107,9 @@ def sendNonTextMessage(message, bot, chat_id):
         )
 
 
-def sendMsg(update: Update, context: CallbackContext):
+def send_msg_command(update: Update, context: CallbackContext) -> None:
     playerName = update.message.chat.username.lower()
-    if not players[playerName].is_online or not players[playerName].partner.is_online:
+    if players[playerName].chat_id is None or players[playerName].partner.chat_id is None:
         return
     if update.message.text:
         context.bot.send_message(
@@ -122,27 +120,16 @@ def sendMsg(update: Update, context: CallbackContext):
         sendNonTextMessage(update.message, context.bot, players[playerName].partner.chat_id)
 
 
-def end_command(update: Update, context: CallbackContext) -> None:
-    # End convo when the command /end is issued.
-    playerName = update.message.chat.username.lower()
-    players[playerName].is_online = False
-    logger.info(f"{update.message.chat.username} ended the conversation.")
-    if players[playerName].partner.is_online:
-        context.bot.send_message(
-            text=messages.LEFT_CHAT,
-            chat_id=players[playerName].partner.chat_id
-        )
-    update.message.reply_text('Sending message cancelled.')
-
-
 def admin_command(update: Update, context: CallbackContext) -> None:
     # Display admin guide when the command /admin is issued.
     update.message.reply_text(messages.ADMIN_GUIDE, parse_mode=constants.PARSEMODE_MARKDOWN_V2)
+    with open('./csv/sample.csv', 'rb') as csv_file:
+        context.bot.send_document(update.message.chat.id, csv_file)
 
 
 def upload_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Saved file.')
-    with open('./inputs/pairings.csv', 'wb+') as csv_file:
+    with open('./csv/pairings.csv', 'wb+') as csv_file:
         context.bot.get_file(update.message.document).download(out=csv_file)
     reload_command(update, CallbackContext)
 
@@ -157,37 +144,31 @@ def reload_command(update: Update, context: CallbackContext) -> None:
 def reset_command(update: Update, context: CallbackContext) -> None:
     # Reset database when the command reset is issued.
     players.clear()
-    if os.path.exists('./inputs/pairings.csv'):
-        os.remove('./inputs/pairings.csv')
-        logger.info('Pairings.csv has been removed.')
-    else:
-        logger.info('Pairings.csv not found.')
-    update.message.reply_text('Players have been resetted.')
-    logger.info('Players have been resetted.')
+    update.message.reply_text('Players have been reset.')
+    logger.info('Players have been reset.')
 
 
 def main():
     BOT_TOKEN = os.environ['BOT_TOKEN']
+    logger.info(player.loadPlayers(players))
     updater = Updater(BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
     # User commands
     dispatcher.add_handler(CommandHandler("start", start_command))
     dispatcher.add_handler(CommandHandler("help", help_command))
-    dispatcher.add_handler(CommandHandler("chat", chat_command))
-    dispatcher.add_handler(MessageHandler(~Filters.command & ~Filters.document.file_extension("csv"), sendMsg))
-    dispatcher.add_handler(CommandHandler("end", end_command))
+    dispatcher.add_handler(MessageHandler(~Filters.command & ~Filters.document.file_extension("csv"), send_msg_command))
 
     # Admin commands.
     dispatcher.add_handler(CommandHandler("admin", admin_command))
     dispatcher.add_handler(CommandHandler("reset", reset_command))
     dispatcher.add_handler(MessageHandler(Filters.document.file_extension("csv"), upload_command))
 
-    updater.start_webhook(listen="0.0.0.0",
-                          port=int(os.environ.get('PORT', 5000)),
-                          url_path=BOT_TOKEN,
-                          webhook_url='https://capt-buddy-bot.herokuapp.com/' + BOT_TOKEN)
-    # updater.start_polling()
+    # updater.start_webhook(listen="0.0.0.0",
+    #                       port=int(os.environ.get('PORT', 5000)),
+    #                       url_path=BOT_TOKEN,
+    #                       webhook_url='https://capt-buddy-bot.herokuapp.com/' + BOT_TOKEN)
+    updater.start_polling()
     updater.idle()
 
 

@@ -9,14 +9,13 @@ class Player():
         self.username = None
         self.partner = None
         self.chat_id = None
-        self.is_online = False
 
 
 # Initialise dict of players from players file
 def loadPlayers(players: dict) -> str:
     players.clear()
     results = ""
-    with open('./inputs/pairings.csv') as csv_file:
+    with open('./csv/pairings.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         for row in csv_reader:
@@ -25,8 +24,8 @@ def loadPlayers(players: dict) -> str:
                 results += f'Column names are {", ".join(row)}.\n'
                 line_count += 1
             else:
-                playerName = row[0].strip().lower()
-                partnerName = row[1].strip().lower()
+                playerName = row[0].strip().lower()[1:]
+                partnerName = row[1].strip().lower()[1:]
                 players[playerName].username = playerName
                 players[playerName].partner = players[partnerName]
                 logger.info(f'{playerName} has partner {partnerName}.')
