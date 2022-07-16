@@ -42,8 +42,7 @@ def loadPlayers(players: dict) -> str:
 def validatePairings(players: dict) -> str:
     for _, player in players.items():
         if player.partner.partner.username != player.username:
-            print(f'Error with {player.username} pairings')
             logger.error(f'Error with {player.username} pairings')
-            exit(1)
+            return f'Error with {player.username} pairings'
     logger.info('Validation complete, no issues with pairings.')
     return 'Validation complete, no issues with pairings.'

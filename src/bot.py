@@ -4,7 +4,7 @@ import messages
 import logging
 import datetime
 from collections import defaultdict
-from telegram import Update
+from telegram import Update, constants
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
 
 
@@ -137,7 +137,7 @@ def end_command(update: Update, context: CallbackContext) -> None:
 
 def admin_command(update: Update, context: CallbackContext) -> None:
     # Display admin guide when the command /admin is issued.
-    update.message.reply_text(messages.ADMIN_GUIDE)
+    update.message.reply_text(messages.ADMIN_GUIDE, parse_mode=constants.PARSEMODE_MARKDOWN_V2)
 
 
 def upload_command(update: Update, context: CallbackContext) -> None:
@@ -168,7 +168,6 @@ def reset_command(update: Update, context: CallbackContext) -> None:
 
 def main():
     BOT_TOKEN = os.environ['BOT_TOKEN']
-
     updater = Updater(BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
