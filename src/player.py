@@ -9,13 +9,14 @@ logger = logging.getLogger(__name__)
 class Player():
     def __init__(self):
         self.username = None
-        self.angel = None
-        self.mortal = None
+        self.partner = None
         self.chat_id = None
+        self.is_online = False
 
 
 # Initialise dict of players from players file
 def loadPlayers(players: dict):
+    players.clear()
     with open(config.PLAYERS_FILENAME) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
@@ -29,7 +30,6 @@ def loadPlayers(players: dict):
                 logger.info(f'\t{playerName} has partner {partnerName}.')
                 players[playerName].username = playerName
                 players[playerName].partner = players[partnerName]
-                players[playerName].is_online = False
                 line_count += 1
         logger.info(f'Processed {line_count} lines.')
     validatePairings(players)
