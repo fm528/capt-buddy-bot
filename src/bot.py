@@ -8,8 +8,6 @@ from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
 
 
-BOT_TOKEN = os.environ['BOT_TOKEN']
-
 # Enable logging.
 logging.basicConfig(
     filename=f'{datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")}.log',
@@ -169,6 +167,8 @@ def reset_command(update: Update, context: CallbackContext) -> None:
 
 
 def main():
+    BOT_TOKEN = os.environ['BOT_TOKEN']
+
     updater = Updater(BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
@@ -185,9 +185,9 @@ def main():
     dispatcher.add_handler(MessageHandler(Filters.document.file_extension("csv"), upload_command))
 
     updater.start_webhook(listen="0.0.0.0",
-                          port=8443,
-                          url_path=BOT_TOKEN)
-    updater.bot.setWebhook('https://capt-buddy-bot.herokuapp.com/' + BOT_TOKEN)
+                          port=int(os.environ.get('PORT', 5000)),
+                          url_path=BOT_TOKEN,
+                          webhook_url='https://capt-buddy-bot.herokuapp.com/' + BOT_TOKEN)
     # updater.start_polling()
     updater.idle()
 
