@@ -1,4 +1,4 @@
-import config
+import os
 import player
 import messages
 import logging
@@ -7,6 +7,9 @@ from collections import defaultdict
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler, CallbackQueryHandler
 
+
+PORT = int(os.environ.get('PORT', 5000))
+BOT_TOKEN = os.environ['BOT_TOKEN']
 
 # Enable logging.
 logging.basicConfig(
@@ -161,7 +164,7 @@ def uploadingCSV(update: Update, context: CallbackContext) -> None:
 def reload_command(update: Update, context: CallbackContext) -> None:
     # Reload database when the command reload is issue
     player.saveChatID(players)
-    logger.info(f'Player chat ids have been saved in {config.CHAT_ID_JSON}.')
+    logger.info(f'Player chat ids have been saved in.')
     player.loadPlayers(players)
     logger.info(f'Players reloaded.')
     update.message.reply_text(f'Players reloaded.')
@@ -180,7 +183,7 @@ def exit_command(update: Update, context: CallbackContext) -> int:
 
 
 def main():
-    updater = Updater(config.ANGEL_BOT_TOKEN, use_context=True)
+    updater = Updater(BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
     # User commands
@@ -197,7 +200,10 @@ def main():
     dispatcher.add_handler(MessageHandler(Filters.document.file_extension("csv"), uploadingCSV))
     dispatcher.add_handler(CommandHandler("exit", exit_command))
 
-    updater.start_polling()
+    updater.start_webhook(listen="0.0.0.0",
+                          port=int(PORT),
+                          url_path=BOT_TOKEN)
+    updater.bot.setWebhook('https://capt-buddy-bot.herokuapp.com/' + BOT_TOKEN)
     updater.idle()
 
 
@@ -207,4 +213,4 @@ if __name__ == '__main__':
         main()
     finally:
         player.saveChatID(players)
-        logger.info(f'Player chat ids have been saved in {config.CHAT_ID_JSON}')
+        logger.info(f'Player chat ids have been saved in.')
