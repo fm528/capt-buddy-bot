@@ -13,8 +13,8 @@ BOT_TOKEN = os.environ['BOT_TOKEN']
 
 # Enable logging.
 logging.basicConfig(
-    filename=f'../log/{datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")}.log',
-    filemode='w',
+    filename=f'log/{datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")}.log',
+    filemode='w+',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
