@@ -1,7 +1,4 @@
-from unittest import result
-import config
 import csv
-import json
 import logging
 
 logger = logging.getLogger(__name__)
