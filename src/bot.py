@@ -8,7 +8,6 @@ from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
 
 
-PORT = int(os.environ.get('PORT', 5000))
 BOT_TOKEN = os.environ['BOT_TOKEN']
 
 # Enable logging.
@@ -186,7 +185,7 @@ def main():
     dispatcher.add_handler(MessageHandler(Filters.document.file_extension("csv"), upload_command))
 
     updater.start_webhook(listen="0.0.0.0",
-                          port=int(PORT),
+                          port=8443,
                           url_path=BOT_TOKEN)
     updater.bot.setWebhook('https://capt-buddy-bot.herokuapp.com/' + BOT_TOKEN)
     # updater.start_polling()
