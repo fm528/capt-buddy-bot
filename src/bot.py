@@ -2,7 +2,6 @@ import os
 import player
 import messages
 import logging
-import datetime
 from collections import defaultdict
 from telegram import Update, constants
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
@@ -10,8 +9,6 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 
 # Enable logging.
 logging.basicConfig(
-    filename=f'{datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S")}.log',
-    filemode='w',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)

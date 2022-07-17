@@ -41,7 +41,7 @@ def loadPlayers(players: dict) -> str:
 def validatePairings(players: dict) -> str:
     for _, player in players.items():
         if player.partner.partner.username != player.username:
-            logger.error(f'Error with {player.username} pairings')
-            return f'Error with {player.username} pairings'
+            logger.error(f'Error with {player.username} pairings. Please check the csv file and try again.')
+            return f'Error with {player.username} pairings.'
     logger.info('Validation complete, no issues with pairings.')
     return 'Validation complete, no issues with pairings.'
