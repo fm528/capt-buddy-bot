@@ -1,38 +1,22 @@
-# Angel and Mortals Bot
+# CAPT Buddy Bot
 
-Send anonymous messages between angels and mortals.
+Send anonymous messages between CAPT or House buddies.
 
-**[NEW]** Now supports photos, stickers, documents, audio, video, and animations!
+Adapted from the Angel and Mortal Bot.
 
-## Read on Medium
+### Change Log
+- **[NEW]** Upload of csv file to register players for admin users.
+- Deployment on Heroku.
+- Support for photos, stickers, documents, audio, video, and animations.
 
-https://chatbotslife.com/building-a-chatbot-for-angel-mortal-5d389ab7acde
-
-## User data
-
-Data used for the game was small so just use file PLAYERS_FILENAME to store usernames of players.
-Order of columns is player, angel and mortal with one header row.
-
-Sample:
+## Sample CSV File
 
 ```
-Player,Angel,Mortal
-username1,username2,username3
-username2,username3,username1
-username3,username1,username2
+Player,Partner
+@telehandle1,@telehandle2
+@telehandle2,@telehandle1
 ```
 
-Note: username/ handle is without @
+## References
 
-## Environment variables
-
-ANGEL_BOT_TOKEN = os.environ['ANGEL_BOT_TOKEN']
-PLAYERS_FILENAME = os.environ['PLAYERS_FILENAME']
-CHAT_ID_JSON = os.environ['CHAT_ID_JSON']
-ANGEL_ALIAS = os.environ['ANGEL_ALIAS']
-MORTAL_ALIAS = os.environ['MORTAL_ALIAS']
-
-## Useful references
-
-https://python-telegram-bot.readthedocs.io/en/stable/telegram.bot.html#telegram.Bot.sendAnimation
-https://python-telegram-bot.readthedocs.io/en/stable/telegram.message.html#telegram.Message
+The bot is built using [Python Telegram Bot](https://pypi.org/project/python-telegram-bot/) library. View the docs [here](https://docs.python-telegram-bot.org/en/v13.13/).
