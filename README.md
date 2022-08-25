@@ -5,6 +5,7 @@ Send anonymous messages between CAPT or House buddies.
 Adapted from the Angel and Mortal Bot.
 
 ### Change Log
+
 - **[NEW]** Upload of csv file to register players for admin users.
 - Deployment on Heroku.
 - Support for photos, stickers, documents, audio, video, and animations.
@@ -13,8 +14,8 @@ Adapted from the Angel and Mortal Bot.
 
 ```
 Player,Partner
-@telehandle1,@telehandle2
-@telehandle2,@telehandle1
+telehandle1,telehandle2
+telehandle2,telehandle1
 ```
 
 ## References

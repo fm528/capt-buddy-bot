@@ -24,8 +24,8 @@ def loadPlayers(players: dict) -> str:
                 results += f'Column names are {", ".join(row)}.\n'
                 line_count += 1
             else:
-                playerName = row[0].strip().lower()[1:]
-                partnerName = row[1].strip().lower()[1:]
+                playerName = row[0].strip().lower()
+                partnerName = row[1].strip().lower()
                 players[playerName].username = playerName
                 players[playerName].partner = players[partnerName]
                 logger.info(f'{playerName} has partner {partnerName}.')
