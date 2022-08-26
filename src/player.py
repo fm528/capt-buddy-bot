@@ -9,6 +9,7 @@ class Player():
         self.username = None
         self.partner = None
         self.chat_id = None
+        self.isAngel = False
 
 
 # Initialise dict of players from players file
@@ -26,10 +27,17 @@ def loadPlayers(players: dict) -> str:
             else:
                 playerName = row[0].strip().lower()
                 partnerName = row[1].strip().lower()
+
                 players[playerName].username = playerName
                 players[playerName].partner = players[partnerName]
-                logger.info(f'{playerName} has partner {partnerName}.')
-                results += f'\n{playerName} has partner {partnerName}.'
+                players[playerName].isAngel = True
+
+                players[partnerName].username = partnerName
+                players[partnerName].partner = players[playerName]
+                players[partnerName].isAngel = False
+
+                logger.info(f'Angel {playerName} has Mortal {partnerName}.')
+                results += f'\nAngel {playerName} has Mortal {partnerName}.'
                 line_count += 1
         logger.info(f'Processed {line_count} lines.')
         results += f'\n\nProcessed {line_count} lines.\n'
@@ -43,5 +51,5 @@ def validatePairings(players: dict) -> str:
         if player.partner.partner.username != player.username:
             logger.error(f'Error with {player.username} pairings. Please check the csv file and try again.')
             return f'Error with {player.username} pairings.'
-    logger.info('Validation complete, no issues with pairings.')
-    return 'Validation complete, no issues with pairings.'
+    logger.info('Validation complete. There are no issues with pairings.')
+    return 'Validation complete. There are no issues with pairings.'
