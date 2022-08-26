@@ -30,7 +30,7 @@ def loadPlayers(players: dict) -> str:
                 players[playerName].username = playerName
                 players[playerName].partner = players[partnerName]
                 players[partnerName].username = partnerName
-                players[partnerName].partner = playerName
+                players[partnerName].partner = players[playerName]
                 logger.info(f'{playerName} has partner {partnerName}.')
                 results += f'\n{playerName} has partner {partnerName}.'
                 line_count += 1
