@@ -19,13 +19,13 @@ players = defaultdict(player.Player)
 
 
 def start_command(update: Update, context: CallbackContext) -> None:
-    # Send a message when the command /start is issued.
+    # Sends a message when the command /start is issued.
     playerName = update.message.chat.username.lower()
     if players[playerName].username is None:
         # Player not found/ registered.
         update.message.reply_text(messages.NOT_REGISTERED)
         return
-    # Register chat id for message sending.
+    # Registers chat id for message sending.
     players[playerName].chat_id = update.message.chat.id
     logger.info(f'{playerName} started the bot with chat_id {players[playerName].chat_id}.')
     update.message.reply_text(f'Hey {playerName}!\n\n{messages.WELCOME_TEXT}{messages.HELP_TEXT}')
@@ -33,7 +33,7 @@ def start_command(update: Update, context: CallbackContext) -> None:
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
-    # Send a message when the command /help is issued.
+    # Sends a message when the command /help is issued.
     update.message.reply_text(messages.HELP_TEXT)
 
 
@@ -118,7 +118,7 @@ def send_msg_command(update: Update, context: CallbackContext) -> None:
 
 
 def admin_command(update: Update, context: CallbackContext) -> None:
-    # Display admin guide when the command /admin is issued.
+    # Displays admin guide when the command /admin is issued.
     update.message.reply_text(messages.ADMIN_GUIDE, parse_mode=constants.PARSEMODE_MARKDOWN_V2)
     with open('./csv/sample.csv', 'rb') as csv_file:
         context.bot.send_document(update.message.chat.id, csv_file)
@@ -132,14 +132,14 @@ def upload_command(update: Update, context: CallbackContext) -> None:
 
 
 def reload_command(update: Update, context: CallbackContext) -> None:
-    # Reload database after receiving new csv file.
+    # Reloads database after receiving new csv file.
     update.message.reply_text(player.loadPlayers(players))
     update.message.reply_text('Players reloaded successfully.')
     logger.info('Players reloaded with new csv file.')
 
 
 def reset_command(update: Update, context: CallbackContext) -> None:
-    # Reset database when the command reset is issued.
+    # Resets database when the command reset is issued.
     players.clear()
     update.message.reply_text('Players have been reset.')
     logger.info('Players have been reset.')
