@@ -1,14 +1,17 @@
-WELCOME_TEXT = 'You will now join the conversation with your buddy! The conversation will only start when both sides have started the bot.\n\n'
+WELCOME_TEXT = 'The conversation will only start when both sides have started the bot.\n\n'
 HELP_TEXT = (
     'This bot supports only text, photos, stickers, documents, audio, video, and animations.'
-    '\n\nThe messages between you and buddy will not be recorded. The conversation will automatically end after the event.'
+    '\n\nThe messages will not be recorded. The conversation will automatically end after the event.'
     '\n\nUse /help if you want to see this message again.'
 )
 ERROR_CHAT_ID = 'Sorry an error occured please type /start again.'
 NOT_REGISTERED = 'Sorry you are not registered with the bot currently.'
-PARTNER_UNAVAILABLE = 'You have started the chat but your buddy has not joined.'
-PARTNER_AVAILABLE = 'You have joined the chat and are now chatting with your buddy.'
-INFORM_PARTNER = 'Your buddy has joined the chat.'
+PARTNER_UNAVAILABLE_MORTAL = 'You have started the chat but your mortal has not joined.'
+PARTNER_UNAVAILABLE_ANGEL = 'You have started the chat but your angel has not joined.'
+PARTNER_AVAILABLE_MORTAL = 'You have joined the chat and are now chatting with your mortal.'
+PARTNER_AVAILABLE_ANGEL = 'You have joined the chat and are now chatting with your angel.'
+INFORM_PARTNER_MORTAL = 'Your mortal has joined the chat.'
+INFORM_PARTNER_ANGEL = 'Your angel has joined the chat.'
 ADMIN_GUIDE = (
     '*FOR ADMIN USERS ONLY*\n\nFollow these steps to upload your pairings:\n\n'
     '1\) Open the `sample\.csv` file using Notepad \(Windows\) or TextEdit \(Mac\)\n'

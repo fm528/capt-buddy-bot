@@ -28,7 +28,8 @@ def start_command(update: Update, context: CallbackContext) -> None:
     # Registers chat id for message sending.
     players[playerName].chat_id = update.message.chat.id
     logger.info(f'{playerName} started the bot with chat_id {players[playerName].chat_id}.')
-    update.message.reply_text(f'Hey {playerName}!\n\n{messages.WELCOME_TEXT}{messages.HELP_TEXT}')
+    update.message.reply_text(
+        f'Hey {"Angel" if players[playerName].isAngel else "Mortal"} {playerName}!\n\n{messages.WELCOME_TEXT}{messages.HELP_TEXT}')
     chat_command(update, context)
 
 
@@ -49,11 +50,22 @@ def chat_command(update: Update, context: CallbackContext) -> None:
         update.message.reply_text(messages.ERROR_CHAT_ID)
         return ConversationHandler.END
     if players[playerName].partner.chat_id is None:
-        update.message.reply_text(messages.PARTNER_UNAVAILABLE)
+        # Player partner not available.
+        update.message.reply_text(
+            messages.PARTNER_UNAVAILABLE_MORTAL
+            if players[playerName].isAngel
+            else messages.PARTNER_UNAVAILABLE_ANGEL
+        )
     else:
-        update.message.reply_text(messages.PARTNER_AVAILABLE)
+        update.message.reply_text(
+            messages.PARTNER_AVAILABLE_MORTAL
+            if players[playerName].isAngel
+            else messages.PARTNER_AVAILABLE_ANGEL
+        )
         context.bot.send_message(
-            text=messages.INFORM_PARTNER,
+            text=messages.INFORM_PARTNER_ANGEL
+            if players[playerName].isAngel
+            else messages.INFORM_PARTNER_MORTAL,
             chat_id=players[playerName].partner.chat_id
         )
 
