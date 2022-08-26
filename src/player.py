@@ -9,6 +9,7 @@ class Player():
         self.username = None
         self.partner = None
         self.chat_id = None
+        self.isAngel = False
 
 
 # Initialise dict of players from players file
@@ -28,6 +29,8 @@ def loadPlayers(players: dict) -> str:
                 partnerName = row[1].strip().lower()
                 players[playerName].username = playerName
                 players[playerName].partner = players[partnerName]
+                players[partnerName].username = partnerName
+                players[partnerName].partner = playerName
                 logger.info(f'{playerName} has partner {partnerName}.')
                 results += f'\n{playerName} has partner {partnerName}.'
                 line_count += 1

@@ -12,9 +12,8 @@ INFORM_PARTNER = 'Your buddy has joined the chat.'
 ADMIN_GUIDE = (
     '*FOR ADMIN USERS ONLY*\n\nFollow these steps to upload your pairings:\n\n'
     '1\) Open the `sample\.csv` file using Notepad \(Windows\) or TextEdit \(Mac\)\n'
-    '2\) Do not change the first line\n'
-    '3\) From the second line onwards, enter the pairing in the format `@telehandle1,@telehandle2`\n'
-    '4\) Once done, save the file\n'
-    '5\) Send the file to me and I\'ll process it\n\n'
-    'Do not that this will override any previous pairings\. Use /reset to clear pairing and /reload to refresh the pairings\.'
+    '2\) Enter the pairing in the format `telehandle1,telehandle2`\n'
+    '3\) Once done, save the file\n'
+    '4\) Send the file to me and I\'ll process it\n\n'
+    'Do not that this will override any previous pairings\. Use /reset to clear the pairings and /reload to refresh the pairings from the last csv file\.'
 )
