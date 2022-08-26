@@ -158,13 +158,14 @@ def main():
 
     # Admin commands.
     dispatcher.add_handler(CommandHandler("admin", admin_command))
+    dispatcher.add_handler(CommandHandler("reload", reload_command))
     dispatcher.add_handler(CommandHandler("reset", reset_command))
     dispatcher.add_handler(MessageHandler(Filters.document.file_extension("csv"), upload_command))
 
     updater.start_webhook(listen="0.0.0.0",
                           port=int(os.environ.get('PORT', 5000)),
                           url_path=BOT_TOKEN,
-                          webhook_url='https://capt-buddy-bot.herokuapp.com/' + BOT_TOKEN)
+                          webhook_url='https://capt-mortal-bot.herokuapp.com/' + BOT_TOKEN)
     # updater.start_polling()
     updater.idle()
 
