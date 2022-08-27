@@ -15,7 +15,6 @@ Adapted from the Angel and Mortal Bot.
 ```
 Player,Partner
 telehandle1,telehandle2
-telehandle2,telehandle1
 ```
 
 ## References
