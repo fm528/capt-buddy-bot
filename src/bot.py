@@ -70,53 +70,52 @@ def chat_command(update: Update, context: CallbackContext) -> None:
         )
 
 
-def sendNonTextMessage(message, bot, chat_id) -> None:
+def sendNonTextMessage(message, bot, chat_id, messageText) -> None:
     if message.photo:
         bot.send_photo(
             photo=message.photo[-1],
-            caption=message.caption,
+            caption=messageText,
             chat_id=chat_id
         )
     elif message.sticker:
         bot.send_sticker(
             sticker=message.sticker,
-            caption=message.caption,
             chat_id=chat_id
         )
     elif message.document:
         bot.send_document(
             document=message.document,
-            caption=message.caption,
+            caption=messageText,
             chat_id=chat_id
         )
     elif message.video:
         bot.send_video(
             video=message.video,
-            caption=message.caption,
+            caption=messageText,
             chat_id=chat_id
         )
     elif message.video_note:
         bot.send_video_note(
             video_note=message.video_note,
-            caption=message.caption,
+            caption=messageText,
             chat_id=chat_id
         )
     elif message.voice:
         bot.send_voice(
             voice=message.voice,
-            caption=message.caption,
+            caption=messageText,
             chat_id=chat_id
         )
     elif message.audio:
         bot.send_audio(
             audio=message.audio,
-            caption=message.caption,
+            caption=messageText,
             chat_id=chat_id
         )
     elif message.animation:
         bot.send_animation(
             animation=message.animation,
-            caption=message.caption,
+            caption=messageText,
             chat_id=chat_id
         )
 
@@ -126,14 +125,14 @@ def send_msg_command(update: Update, context: CallbackContext) -> None:
     if players[playerName].chat_id is None or players[playerName].partner.chat_id is None:
         return
     message = update.message
-    #messageText = angelOrMortal(playerName, update.message)
+    messageText = angelOrMortal(playerName, update.message)
     if message.text:
         context.bot.send_message(
-            text=message.text,
+            text=messageText,
             chat_id=players[playerName].partner.chat_id
         )
     else:
-        sendNonTextMessage(message, context.bot, players[playerName].partner.chat_id)
+        sendNonTextMessage(message, context.bot, players[playerName].partner.chat_id, messageText)
 
 
 def admin_command(update: Update, context: CallbackContext) -> None:
@@ -171,7 +170,7 @@ def angelOrMortal(playerName, message) -> str:
         else:
             message = '\U0001F47C' + message.caption
         return message
-    if players[playerName].isAngel == False:
+    else:
         if message.text:
             message = '\U0001F476' + message.text
         else:
