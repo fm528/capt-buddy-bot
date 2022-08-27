@@ -166,15 +166,15 @@ def reset_command(update: Update, context: CallbackContext) -> None:
 def angelOrMortal(playerName, message) -> str:
     if players[playerName].isAngel:
         if message.text:
-            message = '\U0001F47C' + message.text
+            message = '\U0001F47C' + str(message.text or '')
         else:
-            message = '\U0001F47C' + message.caption
+            message = '\U0001F47C' + str(message.text or '')
         return message
     else:
         if message.text:
-            message = '\U0001F476' + message.text
+            message = '\U0001F476' + str(message.text or '')
         else:
-            message = '\U0001F476' + message.caption
+            message = '\U0001F476' + str(message.text or '')
         return message
 
 
