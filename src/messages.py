@@ -1,6 +1,7 @@
 WELCOME_TEXT = 'The conversation will only start when both sides have started the bot.\n\n'
 HELP_TEXT = (
     'This bot supports only text, photos, stickers, documents, audio, video, and animations.'
+    '\n\nPlease note that a message from an Angel will be prefaced by an angel and a message from a mortal will be prefaced by a human.  DO NOT MIX UP YOUR CHATS!!!'
     '\n\nThe messages will not be recorded. The conversation will automatically end after the event.'
     '\n\nUse /help if you want to see this message again.'
 )
