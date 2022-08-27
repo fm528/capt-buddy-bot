@@ -125,6 +125,7 @@ def send_msg_command(update: Update, context: CallbackContext) -> None:
     playerName = update.message.chat.username.lower()
     if players[playerName].chat_id is None or players[playerName].partner.chat_id is None:
         return
+    message = update.message
     messageText = angelOrMortal(playerName, update.message)
     if message.text:
         context.bot.send_message(
