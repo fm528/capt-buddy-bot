@@ -170,12 +170,12 @@ def angelOrMortal(playerName, message) -> str:
         else:
             message = '\U0001F47C' + message.caption
         return message
-    elif not players[playerName].isAngel:
-        if message.text:
-            message = '\U0001F476' + message.text
-        else:
-            message = '\U0001F476' + message.caption
-            return message
+
+    if message.text:
+        message = '\U0001F476' + message.text
+    else:
+        message = '\U0001F476' + message.caption
+        return message
 
 
 def main():
