@@ -171,11 +171,11 @@ def angelOrMortal(playerName, message) -> str:
         else:
             message = '\U0001F47C' + message.caption
         return message
-    else:
+    if players[playerName].isAngel == False:
         if message.text:
-            message = '\U0001f476' + message.text
+            message = '\U0001F476' + message.text
         else:
-            message = '\U0001f476' + message.caption
+            message = '\U0001F476' + message.caption
             return message
 
 
