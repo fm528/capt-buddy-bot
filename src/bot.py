@@ -158,6 +158,7 @@ def reset_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Players have been reset.')
     logger.info('Players have been reset.')
 
+
 def angelOrMortal(playerName, message):
     if players[playerName].isAngel:
         if message.text:
