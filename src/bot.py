@@ -176,6 +176,8 @@ def angelOrMortal(playerName, message):
 
 def main():
     BOT_TOKEN = os.environ['BOT_TOKEN']
+    WEBHOOK_URL = os.environ['WEBHOOK_URL']
+
     logger.info(player.loadPlayers(players))
     updater = Updater(BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
@@ -194,7 +196,7 @@ def main():
     updater.start_webhook(listen="0.0.0.0",
                           port=int(os.environ.get('PORT', 5000)),
                           url_path=BOT_TOKEN,
-                          webhook_url='https://capt-angel-bot.herokuapp.com/' + BOT_TOKEN)
+                          webhook_url=WEBHOOK_URL + BOT_TOKEN)
     # updater.start_polling()
     updater.idle()
 
