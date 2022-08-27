@@ -118,15 +118,17 @@ def sendNonTextMessage(message, bot, chat_id) -> None:
 
 def send_msg_command(update: Update, context: CallbackContext) -> None:
     playerName = update.message.chat.username.lower()
+    message = angelOrMortal(playerName, message)
     if players[playerName].chat_id is None or players[playerName].partner.chat_id is None:
         return
-    if update.message.text:
+    message = angelOrMortal(playerName, update.message)
+    if message.text:
         context.bot.send_message(
-            text=update.message.text,
+            text=message.text,
             chat_id=players[playerName].partner.chat_id
         )
     else:
-        sendNonTextMessage(update.message, context.bot, players[playerName].partner.chat_id)
+        sendNonTextMessage(message, context.bot, players[playerName].partner.chat_id)
 
 
 def admin_command(update: Update, context: CallbackContext) -> None:
@@ -155,6 +157,20 @@ def reset_command(update: Update, context: CallbackContext) -> None:
     players.clear()
     update.message.reply_text('Players have been reset.')
     logger.info('Players have been reset.')
+
+def angelOrMortal(playerName, message):
+    if players[playerName].isAngel:
+        if message.text:
+            message.text = '\U0001F47C' + message.text
+        else:
+            message.caption = '\U0001F47C' + message.caption
+        return message
+    else:
+        if message.text:
+            message.text = '\U0001f476' + message.text
+        else:
+            message.caption = '\U0001f476' + message.caption
+            return message
 
 
 def main():
