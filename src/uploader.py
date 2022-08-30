@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 cred = credentials.Certificate('creds.json')
 app = firebase_admin.initialize_app(cred)
 db = firestore.client()
-dbName = u'players1'
+dbName = u'players2'
 
 with open('C:/Users/fmcmu/Documents/GitHub/capt-buddy-bot/csv/pairings.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')

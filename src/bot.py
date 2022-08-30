@@ -26,7 +26,7 @@ def start_command(update: Update, context: CallbackContext) -> None:
         update.message.reply_text(messages.NOT_REGISTERED)
         return
     # Registers chat id for message sending.
-    players[playerName].chat_id = update.message.chat.id
+    players[playerName].setChatId(update.message.chat.id)
     logger.info(f'{playerName} started the bot with chat_id {players[playerName].chat_id}.')
     update.message.reply_text(
         f'Hey {"Angel" if players[playerName].isAngel else "Mortal"} {playerName}!\n\n{messages.WELCOME_TEXT}{messages.HELP_TEXT}')
@@ -151,7 +151,6 @@ def upload_command(update: Update, context: CallbackContext) -> None:
 
 def reload_command(update: Update, context: CallbackContext) -> None:
     # Reloads database after receiving new csv file.
-    player.saveChatID(players)
     update.message.reply_text(player.loadPlayers(players))
     update.message.reply_text('Players reloaded successfully.')
     logger.info('Players reloaded with new csv file.')
@@ -211,5 +210,4 @@ if __name__ == '__main__':
         logger.info("Bot has started.")
         main()
     finally:
-        player.saveChatID(players)
         logger.info("Bot has terminated.")

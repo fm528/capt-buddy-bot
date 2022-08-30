@@ -1,8 +1,15 @@
 import csv
 import logging
 
-logger = logging.getLogger(__name__)
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 
+logger = logging.getLogger(__name__)
+cred = credentials.Certificate('creds.json')-
+app = firebase_admin.initialize_app(cred)
+db = firestore.client()
+dbName = u'players1'
 
 class Player():
     def __init__(self):
@@ -10,6 +17,17 @@ class Player():
         self.partner = None
         self.chat_id = None
         self.isAngel = False
+
+    def setChatId(self,id):
+        self.chat_id = id
+        docs = db.collection(dbName).where(u'username',u'==',self.username).stream()
+        result = None
+        indent = None
+        for doc in docs:
+            indent = db.collection(dbName).document(doc.id)
+        indent.update({
+            u'chatId' : id
+        })
 
 
 # Initialise dict of players from players file
@@ -28,12 +46,18 @@ def loadPlayers(players: dict) -> str:
                 playerName = row[0].strip().lower()
                 partnerName = row[1].strip().lower()
 
+                for doc in db.collection(dbName).where(u'username',u'==',playerName).stream(): player = doc.to_dict()
+
                 players[playerName].username = playerName
                 players[playerName].partner = players[partnerName]
+                players[playerName].chat_id = player["chatId"]
                 players[playerName].isAngel = True
+
+                for doc in db.collection(dbName).where(u'username',u'==',partnerName).stream(): partner = doc.to_dict()
 
                 players[partnerName].username = partnerName
                 players[partnerName].partner = players[playerName]
+                players[partnerName].chat_id = partner["chatId"]
                 players[partnerName].isAngel = False
 
                 logger.info(f'Angel {playerName} has Mortal {partnerName}.')
@@ -42,9 +66,7 @@ def loadPlayers(players: dict) -> str:
         logger.info(f'Processed {line_count} lines.')
         results += f'\n\nProcessed {line_count} lines.\n'
     results += validatePairings(players)
-    loadChatID(players)
     return results
-
 
 
 # Checks if players relation is symmetric
@@ -55,23 +77,3 @@ def validatePairings(players: dict) -> str:
             return f'Error with {player.username} pairings.'
     logger.info('Validation complete. There are no issues with pairings.')
     return 'Validation complete. There are no issues with pairings.'
-
-def saveChatID(players: dict):
-    temp = {}
-    for k, v in players.items():
-        temp[k] = v.chat_id
-    
-    with open(config.CHAT_ID_JSON, 'w+') as f:
-        json.dump(temp, f)
-
-def loadChatID(players: dict):
-    try:
-        with open(config.CHAT_ID_JSON, 'r') as f:
-            temp = json.load(f)
-
-            logger.info(temp)
-
-            for k, v in temp.items():
-                players[k].chat_id = v
-    except:
-        logger.warn('Fail to load chat ids')
