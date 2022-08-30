@@ -42,7 +42,9 @@ def loadPlayers(players: dict) -> str:
         logger.info(f'Processed {line_count} lines.')
         results += f'\n\nProcessed {line_count} lines.\n'
     results += validatePairings(players)
+    loadChatID(players)
     return results
+
 
 
 # Checks if players relation is symmetric
@@ -53,3 +55,23 @@ def validatePairings(players: dict) -> str:
             return f'Error with {player.username} pairings.'
     logger.info('Validation complete. There are no issues with pairings.')
     return 'Validation complete. There are no issues with pairings.'
+
+def saveChatID(players: dict):
+    temp = {}
+    for k, v in players.items():
+        temp[k] = v.chat_id
+    
+    with open(config.CHAT_ID_JSON, 'w+') as f:
+        json.dump(temp, f)
+
+def loadChatID(players: dict):
+    try:
+        with open(config.CHAT_ID_JSON, 'r') as f:
+            temp = json.load(f)
+
+            logger.info(temp)
+
+            for k, v in temp.items():
+                players[k].chat_id = v
+    except:
+        logger.warn('Fail to load chat ids')

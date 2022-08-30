@@ -151,6 +151,7 @@ def upload_command(update: Update, context: CallbackContext) -> None:
 
 def reload_command(update: Update, context: CallbackContext) -> None:
     # Reloads database after receiving new csv file.
+    player.saveChatID(players)
     update.message.reply_text(player.loadPlayers(players))
     update.message.reply_text('Players reloaded successfully.')
     logger.info('Players reloaded with new csv file.')
@@ -210,4 +211,5 @@ if __name__ == '__main__':
         logger.info("Bot has started.")
         main()
     finally:
+        player.saveChatID(players)
         logger.info("Bot has terminated.")
