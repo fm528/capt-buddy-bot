@@ -2,6 +2,7 @@ import os
 import player
 import messages
 import logging
+import pickle
 from collections import defaultdict
 from telegram import Update, constants
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
@@ -31,6 +32,7 @@ def start_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(
         f'Hey {"Angel" if players[playerName].isAngel else "Mortal"} {playerName}!\n\n{messages.WELCOME_TEXT}{messages.HELP_TEXT}')
     chat_command(update, context)
+    pickle.load
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
