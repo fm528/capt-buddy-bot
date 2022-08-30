@@ -3,3 +3,5 @@
 
 # pycache
 src/__pycache__
+src/creds.json
+
