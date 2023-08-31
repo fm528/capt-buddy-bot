@@ -1,15 +1,15 @@
 import csv
 import logging
 
-logger = logging.getLogger(__name__)
-<<<<<<< Updated upstream
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 
-=======
-cred = credentials.Certificate('creds.json')
+logger = logging.getLogger(__name__)
+cred = credentials.Certificate('creds.json')-
 app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 dbName = u'players'
->>>>>>> Stashed changes
 
 class Player():
     def __init__(self):
@@ -17,6 +17,17 @@ class Player():
         self.partner = None
         self.chat_id = None
         self.isAngel = False
+
+    def setChatId(self,id):
+        self.chat_id = id
+        docs = db.collection(dbName).where(u'username',u'==',self.username).stream()
+        result = None
+        indent = None
+        for doc in docs:
+            indent = db.collection(dbName).document(doc.id)
+        indent.update({
+            u'chatId' : id
+        })
 
 
 # Initialise dict of players from players file
@@ -35,12 +46,18 @@ def loadPlayers(players: dict) -> str:
                 playerName = row[0].strip().lower()
                 partnerName = row[1].strip().lower()
 
+                for doc in db.collection(dbName).where(u'username',u'==',playerName).stream(): player = doc.to_dict()
+
                 players[playerName].username = playerName
                 players[playerName].partner = players[partnerName]
+                players[playerName].chat_id = player["chatId"]
                 players[playerName].isAngel = True
+
+                for doc in db.collection(dbName).where(u'username',u'==',partnerName).stream(): partner = doc.to_dict()
 
                 players[partnerName].username = partnerName
                 players[partnerName].partner = players[playerName]
+                players[partnerName].chat_id = partner["chatId"]
                 players[partnerName].isAngel = False
 
                 logger.info(f'Angel {playerName} has Mortal {partnerName}.')
