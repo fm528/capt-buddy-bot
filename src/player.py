@@ -6,7 +6,7 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 
 logger = logging.getLogger(__name__)
-cred = credentials.Certificate('creds.json')
+cred = credentials.Certificate('./creds.json')
 app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 dbName = u'players'
