@@ -2,7 +2,14 @@ import csv
 import logging
 
 logger = logging.getLogger(__name__)
+<<<<<<< Updated upstream
 
+=======
+cred = credentials.Certificate('creds.json')
+app = firebase_admin.initialize_app(cred)
+db = firestore.client()
+dbName = u'players'
+>>>>>>> Stashed changes
 
 class Player():
     def __init__(self):
